@@ -6,6 +6,7 @@
   "scripts": {
     "css": "gulp css",
     "js": "gulp js",
+    "images": "gulp images",
     "start": "gulp",
     "watch": "gulp watch",
     "test": "echo \"Error: no test specified\" && exit 1"
