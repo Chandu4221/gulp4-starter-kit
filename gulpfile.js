@@ -12,24 +12,34 @@ var gulp = require("gulp"),
   lineEC = require("gulp-line-ending-corrector"),
   rename = require("gulp-rename"),
   notify = require("gulp-notify"),
-  path = require("path");
+  path = require("path"),
+  htmlmin = require("gulp-htmlmin");
 
 var appUrl = path.join(__dirname, "app");
 
 var srcPaths = {
-  html: appUrl,
+  html: path.join(appUrl, "src"),
   scss: path.join(appUrl, "src/scss"),
   js: path.join(appUrl, "src/js"),
   images: path.join(appUrl, "src/images"),
   fonts: path.join(appUrl, "src/fonts")
 };
 var distPaths = {
-  html: appUrl,
+  html: path.join(appUrl, "dist"),
   css: path.join(appUrl, "dist/css"),
   js: path.join(appUrl, "dist/js"),
   images: path.join(appUrl, "dist/images"),
   fonts: path.join(appUrl, "dist/fonts")
 };
+
+/*HTML*/
+
+function html() {
+  return gulp
+    .src([srcPaths.html + "/**/*.html"])
+    .pipe(htmlmin({ collapseWhitespace: true }))
+    .pipe(gulp.dest(distPaths.html));
+}
 
 /*  CSS  */
 function css() {
@@ -53,7 +63,7 @@ function javascript() {
     .src([srcPaths.js + "/**/*.js"])
     .pipe(gulp.dest(distPaths.js))
     .pipe(uglify())
-    .pipe(rename({ suffix: "min" }))
+    .pipe(rename({ suffix: ".min" }))
     .pipe(gulp.dest(distPaths.js));
 }
 
@@ -76,20 +86,22 @@ function images() {
 function watch() {
   browserSync.init({
     open: "external",
-    server: path.join(__dirname, "app"),
+    server: path.join(appUrl, "dist"),
     port: 8080
   });
+  gulp.watch(srcPaths.html, html);
   gulp.watch(srcPaths.scss, css);
   gulp.watch(srcPaths.js, javascript);
   gulp.watch(srcPaths.images, images);
   gulp
-    .watch([distPaths.css, distPaths.js, distPaths.images, appUrl])
-    .on("change", browserSync.reload);
+    .watch([distPaths.css, distPaths.js, distPaths.images, distPaths.html])
+    .on("change", reload);
 }
 
 exports.css = css;
 exports.js = javascript;
 exports.images = images;
 exports.watch = watch;
+exports.html = html;
 
 gulp.task("default", watch);
