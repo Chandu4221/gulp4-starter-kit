@@ -1,11 +1,10 @@
 var gulp = require("gulp"),
-  autoprefixer = require("gulp-autoprefixer"),
+  // autoprefixer = require("gulp-autoprefixer"),
   browserSync = require("browser-sync").create(),
   reload = browserSync.reload,
   sass = require("gulp-sass"),
   cleanCSS = require("gulp-clean-css"),
   sourcemaps = require("gulp-sourcemaps"),
-  concat = require("gulp-concat"),
   imagemin = require("gulp-imagemin"),
   changed = require("gulp-changed"),
   uglify = require("gulp-uglify"),
@@ -13,7 +12,8 @@ var gulp = require("gulp"),
   rename = require("gulp-rename"),
   notify = require("gulp-notify"),
   path = require("path"),
-  htmlmin = require("gulp-htmlmin");
+  htmlmin = require("gulp-htmlmin"),
+  purgecss = require("gulp-purgecss");
 
 var appUrl = path.join(__dirname, "app");
 
@@ -47,14 +47,23 @@ function css() {
     .src([srcPaths.scss + "/**/*.scss"])
     .pipe(sourcemaps.init({ loadMaps: true }))
     .pipe(sass({ outputStyle: "expanded" }).on("error", sass.logError))
-    .pipe(autoprefixer({ browsers: "last 2 versions", cascade: false }))
     .pipe(sourcemaps.write())
     .pipe(lineEC())
+    .pipe(
+      purgecss({
+        content: [`${srcPaths.html}/**/*.html`]
+      })
+    )
     .pipe(gulp.dest(distPaths.css))
     .pipe(cleanCSS({ compatibility: "ie8" }))
     .pipe(rename({ suffix: ".min" }))
     .pipe(gulp.dest(distPaths.css))
-    .pipe(notify("CSS Compiled Successfully"));
+    .pipe(
+      notify({
+        message: "CSS Compiled Successfully",
+        timeout: 1
+      })
+    );
 }
 
 /*Javascript*/
@@ -89,7 +98,7 @@ function watch() {
     server: path.join(appUrl, "dist"),
     port: 8080
   });
-  gulp.watch(srcPaths.html, html);
+  gulp.watch(srcPaths.html, gulp.series(html, css, javascript));
   gulp.watch(srcPaths.scss, css);
   gulp.watch(srcPaths.js, javascript);
   gulp.watch(srcPaths.images, images);
