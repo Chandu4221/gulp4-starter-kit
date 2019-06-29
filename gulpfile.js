@@ -1,5 +1,4 @@
 var gulp = require("gulp"),
-  // autoprefixer = require("gulp-autoprefixer"),
   browserSync = require("browser-sync").create(),
   reload = browserSync.reload,
   sass = require("gulp-sass"),
@@ -58,12 +57,7 @@ function css() {
     .pipe(cleanCSS({ compatibility: "ie8" }))
     .pipe(rename({ suffix: ".min" }))
     .pipe(gulp.dest(distPaths.css))
-    .pipe(
-      notify({
-        message: "CSS Compiled Successfully",
-        timeout: 1
-      })
-    );
+    .pipe(notify("CSS Compiled Successfully"));
 }
 
 /*Javascript*/
