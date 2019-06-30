@@ -39,22 +39,18 @@ function html() {
     .pipe(htmlmin({ collapseWhitespace: true }))
     .pipe(gulp.dest(distPaths.html));
 }
-
-/*  CSS  */
-function css() {
+/*CSS*/
+function scss() {
   return gulp
-    .src([srcPaths.scss + "/**/*.scss"])
+    .src([srcPaths.scss] + "/**/*.scss")
     .pipe(sourcemaps.init({ loadMaps: true }))
     .pipe(sass({ outputStyle: "expanded" }).on("error", sass.logError))
     .pipe(sourcemaps.write())
     .pipe(lineEC())
-    .pipe(
-      purgecss({
-        content: [`${srcPaths.html}/**/*.html`]
-      })
-    )
     .pipe(gulp.dest(distPaths.css))
-    .pipe(cleanCSS({ compatibility: "ie8" }))
+    .pipe(purgecss({ content: [`${srcPaths.html}/**/*.html`] }))
+    .pipe(gulp.dest(distPaths.css))
+    .pipe(cleanCSS())
     .pipe(rename({ suffix: ".min" }))
     .pipe(gulp.dest(distPaths.css))
     .pipe(notify("CSS Compiled Successfully"));
@@ -92,8 +88,8 @@ function watch() {
     server: path.join(appUrl, "dist"),
     port: 8080
   });
-  gulp.watch(srcPaths.html, gulp.series(html, css, javascript));
-  gulp.watch(srcPaths.scss, css);
+  gulp.watch(srcPaths.html, gulp.series(html, scss, javascript));
+  gulp.watch(srcPaths.scss, scss);
   gulp.watch(srcPaths.js, javascript);
   gulp.watch(srcPaths.images, images);
   gulp
@@ -101,7 +97,7 @@ function watch() {
     .on("change", reload);
 }
 
-exports.css = css;
+exports.scss = scss;
 exports.js = javascript;
 exports.images = images;
 exports.watch = watch;

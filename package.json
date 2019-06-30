@@ -4,7 +4,7 @@
   "description": "Gulp 4 Starter Kit",
   "main": "index.js",
   "scripts": {
-    "css": "gulp css",
+    "scss": "gulp scss",
     "js": "gulp js",
     "images": "gulp images",
     "start": "gulp",
